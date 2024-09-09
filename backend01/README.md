@@ -53,3 +53,23 @@ import { MongooseModule } from '@nestjs/mongoose';
 ```
 
 **`schemas (in mongodb) is entities (SQL)`**
+
+A simple schema
+
+```ts
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+
+export type UserDocument = HydratedDocument<User>;
+
+@Schema()
+export class User {
+    @Prop()
+    name: string;
+
+    @Prop()
+    age: number;
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);
+```
