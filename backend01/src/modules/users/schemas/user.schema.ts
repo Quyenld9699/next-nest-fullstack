@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { AccountType, UserRoles } from 'src/constants';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -23,21 +24,20 @@ export class User {
     @Prop()
     image: string;
 
-    @Prop()
-    role: string;
+    @Prop({ default: UserRoles.USER })
+    role: UserRoles;
 
-    @Prop()
-    accountType: string;
+    @Prop({ default: AccountType.NORMAL })
+    accountType: AccountType;
 
-    @Prop()
-    isActive: string;
+    @Prop({ default: false })
+    isActive: boolean;
 
     @Prop()
     codeId: string;
 
     @Prop()
     codeExpired: Date;
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

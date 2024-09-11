@@ -1,4 +1,4 @@
-# next-next-fullstack
+# NextJs && NestJS
 
 **[Frontend Readme](/frontend01/README.md)**
 
