@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { hashPassword } from 'src/helpers/utils';
 import apq from 'api-query-params';
 @Injectable()
@@ -33,19 +33,42 @@ export class UsersService {
         return newUser;
     }
 
-    async findAll(query: string) {
-        return `This action returns all users`;
+    async findAll(query: string, pageCurrent: number, pageSize: number) {
+        const { filter, sort } = apq(query);
+
+        if (filter.pageCurrent) delete filter.pageCurrent;
+        if (filter.pageSize) delete filter.pageSize;
+
+        if (!pageSize) pageSize = 10;
+        if (!pageCurrent) pageCurrent = 1;
+
+        const skip = (pageCurrent - 1) * pageSize;
+        const totalItems = await this.userModel.countDocuments();
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        const result = await this.userModel
+            .find(filter)
+            .skip(skip)
+            .limit(pageSize)
+            .select('-password')
+            .sort(sort as any);
+        return { result, totalPages };
     }
 
     findOne(id: number) {
         return `This action returns a #${id} user`;
     }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
-        return `This action updates a #${id} user`;
+    async update(updateUserDto: UpdateUserDto) {
+        return this.userModel.updateOne({ _id: updateUserDto._id }, updateUserDto);
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} user`;
+    remove(id: string) {
+        // TODO: check id
+        if (mongoose.isValidObjectId(id)) {
+            return this.userModel.deleteOne({ _id: id });
+        } else {
+            throw new BadRequestException('Invalid ID');
+        }
     }
 }
