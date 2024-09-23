@@ -6,6 +6,9 @@ import { User } from './schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
 import { hashPassword } from 'src/helpers/utils';
 import apq from 'api-query-params';
+import { CreateAuthDto } from 'src/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
@@ -29,6 +32,24 @@ export class UsersService {
         const newUser = await this.userModel.create({
             ...createUserDto,
             password: hashPass,
+        });
+        return newUser;
+    }
+
+    async register(authRegisterData: CreateAuthDto) {
+        const hashPass = await hashPassword(authRegisterData.password);
+        // TODO: check email exist
+        if (await this.isEmailExist(authRegisterData.email)) {
+            throw new BadRequestException('Email is already exist');
+        }
+
+        // TODO: hash password
+        const newUser = await this.userModel.create({
+            ...authRegisterData,
+            password: hashPass,
+            isActive: false,
+            codeId: uuidv4(),
+            codeExpired: dayjs().add(1, 'minutes').toDate(),
         });
         return newUser;
     }
