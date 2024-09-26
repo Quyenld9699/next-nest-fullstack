@@ -14,11 +14,18 @@ nest g resource [name_resource] [--no-spec]
 
 file `.env`
 
-```env
+```.env
 PORT=8081
 MONGODB_URI=mongodb://root:123456@localhost:27017/quyenlee?authSource=admin
 JWT_SECRET_KEY=aa4f8e2b-0d8a-49d1-be30-f532d78fbb56
 JWT_ACCESS_TOKEN_EXPIRES_IN=1000d
+```
+
+file `.env.local`
+
+```.env.local
+MAILDEV_INCOMING_USER=
+MAILDEV_INCOMING_PASS=
 ```
 
 Change dynamic port get from `.env` in `main.ts`
@@ -40,7 +47,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Module({
     imports: [
         UsersModule,
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '.env.local'] }),  // TODO: Khai bao env file path app read
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
@@ -128,3 +135,10 @@ Each `guard` have strategy: Ex:
 -   `LocalAuthGuard` have `LocalStrategy`
 
 In `controller` when use `@UseGuards(LocalAuthGuard | JwtAuthGuard)` the request return data user by function `validate` in `LocalStrategy | JwtStrategy`
+
+## Send email authen
+
+```bash
+npm i --save-exact @nestjs-modules/mailer@2.0.2 nodemailer@6.9.14 handlebars@4.7.8
+npm i --save-dev @types/nodemailer
+```
