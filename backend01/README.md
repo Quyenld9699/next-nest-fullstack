@@ -142,3 +142,69 @@ In `controller` when use `@UseGuards(LocalAuthGuard | JwtAuthGuard)` the request
 npm i --save-exact @nestjs-modules/mailer@2.0.2 nodemailer@6.9.14 handlebars@4.7.8
 npm i --save-dev @types/nodemailer
 ```
+
+change config in nest-cli.json
+
+```json
+{
+    "$schema": "https://json.schemastore.org/nest-cli",
+    "collection": "@nestjs/schematics",
+    "sourceRoot": "src",
+    "compilerOptions": {
+        "deleteOutDir": true,
+        "assets": ["mail/templates/**/*"] // complie template .hbs
+    },
+    "watchAssets": true
+}
+```
+
+config mail module in app.module.ts
+
+```ts
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                transport: {
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    // ignoreTLS: true,
+                    secure: true,
+                    auth: {
+                        user: configService.get<string>('MAILDEV_INCOMING_USER'),
+                        pass: configService.get<string>('MAILDEV_INCOMING_PASS'),
+                    },
+                },
+                defaults: {
+                    from: '"No Reply" <no-reply@localhost>',
+                },
+                // preview: true,
+                template: {
+                    dir: process.cwd() + '/src/mail/templates/',
+                    adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+                    options: {
+                        strict: true,
+                    },
+                },
+            }),
+            inject: [ConfigService],
+        }),
+```
+
+And send email when register acount
+
+```ts
+this.mailerService
+    .sendMail({
+        to: newUser.email,
+        subject: 'Activate your account',
+        template: 'register', //where: src/mail/templates/register.hbs
+        context: {
+            name: newUser.name || newUser.email,
+            activationCode: codeId,
+        },
+    })
+    .then(() => {})
+    .catch((e) => {
+        console.log('co loi roi', e);
+    });
+```
