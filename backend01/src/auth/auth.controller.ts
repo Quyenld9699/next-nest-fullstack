@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CodeVerifyEmailDto, CreateAuthDto } from './dto/create-auth.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { CodeVerifyEmailDto, CreateAuthDto, LoginDto, ResendVerifyEmailDto } from './dto/create-auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
-import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { Public } from 'src/decorator';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -14,15 +14,16 @@ export class AuthController {
         private readonly mailerService: MailerService
     ) {}
 
+    @Post('login')
     @Public()
     @UseGuards(LocalAuthGuard)
-    @Post('login')
-    signIn(@Request() req) {
+    signIn(@Request() req, @Body() body: LoginDto) {
         return this.authService.login(req.user);
     }
 
     // @UseGuards(JwtAuthGuard)
     @Get('profile')
+    @ApiOperation({ summary: 'profile' })
     getProfile(@Request() req) {
         return req.user;
     }
@@ -41,7 +42,7 @@ export class AuthController {
 
     @Post('resend-verify-email')
     @Public()
-    resendVerifyEmail(@Body() body: { email: string }) {
+    resendVerifyEmail(@Body() body: ResendVerifyEmailDto) {
         return this.authService.resendVerifyEmail(body);
     }
 

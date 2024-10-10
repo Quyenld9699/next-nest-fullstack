@@ -2,33 +2,35 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MenuItemsService } from './menu.items.service';
 import { CreateMenuItemDto } from './dto/create-menu.item.dto';
 import { UpdateMenuItemDto } from './dto/update-menu.item.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('menu-items')
 @Controller('menu-items')
 export class MenuItemsController {
-  constructor(private readonly menuItemsService: MenuItemsService) { }
+    constructor(private readonly menuItemsService: MenuItemsService) {}
 
-  @Post()
-  create(@Body() createMenuItemDto: CreateMenuItemDto) {
-    return this.menuItemsService.create(createMenuItemDto);
-  }
+    @Post()
+    create(@Body() createMenuItemDto: CreateMenuItemDto) {
+        return this.menuItemsService.create(createMenuItemDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.menuItemsService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.menuItemsService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.menuItemsService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.menuItemsService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMenuItemDto: UpdateMenuItemDto) {
-    return this.menuItemsService.update(+id, updateMenuItemDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateMenuItemDto: UpdateMenuItemDto) {
+        return this.menuItemsService.update(+id, updateMenuItemDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.menuItemsService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.menuItemsService.remove(+id);
+    }
 }
