@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { auth } from 'src/auth';
 
-export default function Dashboard() {
-    return <div>Dashboard</div>;
+export default async function Dashboard() {
+    const session = await auth();
+    return <div>{session?.user?.access_token}</div>;
 }

@@ -9,3 +9,11 @@ export class CreateAuthDto {
     @IsOptional()
     name: string;
 }
+
+export class CodeVerifyEmailDto {
+    @IsNotEmpty({ message: 'Code is required' })
+    code: string;
+
+    @IsNotEmpty({ message: 'ID is required' })
+    id: string;
+}

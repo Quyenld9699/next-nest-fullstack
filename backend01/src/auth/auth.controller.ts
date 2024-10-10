@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CodeVerifyEmailDto, CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
@@ -31,6 +31,18 @@ export class AuthController {
     @Public()
     register(@Body() createAuthDto: CreateAuthDto) {
         return this.authService.register(createAuthDto);
+    }
+
+    @Post('verify-email')
+    @Public()
+    verifyEmail(@Body() body: CodeVerifyEmailDto) {
+        return this.authService.verifyEmail(body);
+    }
+
+    @Post('resend-verify-email')
+    @Public()
+    resendVerifyEmail(@Body() body: { email: string }) {
+        return this.authService.resendVerifyEmail(body);
     }
 
     @Get('mail')
